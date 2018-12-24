@@ -11,6 +11,7 @@ class Hill_Climbing(algorithm.Algorithm):
         initialize algorithm object with psu_dict, order list and dict to decode items via parent algorithm class
         '''
         super().__init__(psu_dict, order, decode_dict)
+        self.name = "Hill Climbing"
 
     def run(self):
         '''

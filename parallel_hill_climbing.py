@@ -10,6 +10,7 @@ class Parallel_Hill_Climbing(hill_climbing.Hill_Climbing):
         initialize algorithm object with psu_dict, order list and dict to decode items via parent class
         '''
         super().__init__(psu_dict, order, decode_dict)
+        self.name = "Parallel Hill Climbing"
         self.default = False
         try: 
             self.num_start_states = int(num_start_states.replace(" ", ""))

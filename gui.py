@@ -1,6 +1,6 @@
 from tkinter import Tk, Frame, Label, Button, Entry, GROOVE, N,S, W, LEFT, StringVar
 from tkinter import filedialog
-import parser, hill_climbing, first_choice_hill_climbing, simulated_annealing, parallel_hill_climbing, local_beam_search
+import parser, hill_climbing, first_choice_hill_climbing, simulated_annealing, parallel_hill_climbing, local_beam_search, comparator
 import time
 
 class Gui(object):
@@ -21,6 +21,8 @@ class Gui(object):
         window.geometry('1400x400')
         window.grid_columnconfigure(3, minsize=50)
         window.grid_rowconfigure(4, minsize=20)
+        window.grid_rowconfigure(11, minsize=20)
+
 
         # initialize input related buttons and labels
         self.problem_file_name = StringVar() # contains the file name of the problem.txt file chosen 
@@ -57,12 +59,12 @@ class Gui(object):
         self.n_states_beam = Entry(window, width=20) # input number of start states for local beam search
         self.n_states_beam.grid(column=1, row=10)
         algorithm_lbl = Label(window, text="Choose Algorithm", font=("Arial Bold", 15)).grid(column=2, row=5)
-        btn_1 = Button(window, text=self.algorithms[1], command=lambda: self.choose_algorithm(1), width = 20).grid(column=2, row=6)
-        btn_2 = Button(window, text=self.algorithms[2], command=lambda: self.choose_algorithm(2), width = 20).grid(column=2, row=7)
-        btn_3 = Button(window, text=self.algorithms[3], command=lambda: self.choose_algorithm(3), width = 20).grid(column=2, row=8)
-        btn_4 = Button(window, text=self.algorithms[4], command=lambda: self.choose_algorithm(4), width = 20).grid(column=2, row=9)
-        btn_5 = Button(window, text=self.algorithms[5], command=lambda: self.choose_algorithm(5), width = 20).grid(column=2, row=10)
-
+        btn_1 = Button(window, text=self.algorithms[1], command=lambda: self.choose_algorithm(1), width=20).grid(column=2, row=6)
+        btn_2 = Button(window, text=self.algorithms[2], command=lambda: self.choose_algorithm(2), width=20).grid(column=2, row=7)
+        btn_3 = Button(window, text=self.algorithms[3], command=lambda: self.choose_algorithm(3), width=20).grid(column=2, row=8)
+        btn_4 = Button(window, text=self.algorithms[4], command=lambda: self.choose_algorithm(4), width=20).grid(column=2, row=9)
+        btn_5 = Button(window, text=self.algorithms[5], command=lambda: self.choose_algorithm(5), width=20).grid(column=2, row=10)
+        btn_6 = Button(window, text="download comparison.csv", command=lambda: self.choose_algorithm(6), width=20).grid(column=2, row=12)
         
 
     def load_problem(self):
@@ -129,33 +131,45 @@ class Gui(object):
         method for choosing and calling the correct algorithm (depending on the button used to call the method)
         given the outputs of the respective algorithms, the method updates the output labels of the GUI
         '''
-        n_states = ""
-        if name == 1:
-            # hill climbing
-            alg = hill_climbing.Hill_Climbing(self.psu_dict, self.order, self.decode_dict)
-            provided_items_str, num_psus, result_str = alg.run()
-        elif name == 2:
-            # first choice hill climbing
-            alg = first_choice_hill_climbing.First_Choice_Hill_Climbing(self.psu_dict, self.order, self.decode_dict)
-            provided_items_str, num_psus, result_str = alg.run()
-        elif name == 3:
-            # simulated annealing
-            alg = simulated_annealing.Simulated_Annealing(self.psu_dict, self.order, self.decode_dict)
-            provided_items_str, num_psus, result_str = alg.run()
-        elif name == 4:
-            # parallel hill climbing with n start states
-            alg = parallel_hill_climbing.Parallel_Hill_Climbing(self.psu_dict, self.order, self.decode_dict, self.n_states_parallel.get())
-            provided_items_str, num_psus, result_str, n_states = alg.run()
-        elif name == 5:
-            # local beam search with n start states
-            alg = local_beam_search.Local_Beam_Search(self.psu_dict, self.order, self.decode_dict, self.n_states_beam.get())
-            provided_items_str, num_psus, result_str, n_states = alg.run()
+        try:
+            n_states = ""
+            if name == 1:
+                # hill climbing
+                alg = hill_climbing.Hill_Climbing(self.psu_dict, self.order, self.decode_dict)
+                provided_items_str, num_psus, result_str = alg.run()
+            elif name == 2:
+                # first choice hill climbing
+                alg = first_choice_hill_climbing.First_Choice_Hill_Climbing(self.psu_dict, self.order, self.decode_dict)
+                provided_items_str, num_psus, result_str = alg.run()
+            elif name == 3:
+                # simulated annealing
+                alg = simulated_annealing.Simulated_Annealing(self.psu_dict, self.order, self.decode_dict)
+                provided_items_str, num_psus, result_str = alg.run()
+            elif name == 4:
+                # parallel hill climbing with n start states
+                alg = parallel_hill_climbing.Parallel_Hill_Climbing(self.psu_dict, self.order, self.decode_dict, self.n_states_parallel.get())
+                provided_items_str, num_psus, result_str, n_states = alg.run()
+            elif name == 5:
+                # local beam search with n start states
+                alg = local_beam_search.Local_Beam_Search(self.psu_dict, self.order, self.decode_dict, self.n_states_beam.get())
+                provided_items_str, num_psus, result_str, n_states = alg.run()
+            elif name == 6:
+                comparison = comparator.Comparator(self.psu_dict, self.order, self.decode_dict)
+                comparison.compare_all()
+                path = filedialog.asksaveasfilename(defaultextension=".csv")
+                comparison.download(path)
+                        
+            # update labels with local search result
+            if name == 6:
+                self.status.set("done with Comparison - downloaded to: {}...{}".format(path[:30],path[-30:]))
+            else:
+                self.provided_items.set(provided_items_str)
+                self.num_psus.set(num_psus)
+                self.result_dict.set(result_str)
+                self.status.set("done with {} {} - ignored items: {}".format(self.algorithms[name], n_states, self.missing_items))
+        except:
+            self.status.set("Please select a problem and order file first!")
 
-        # update labels with local search result
-        self.provided_items.set(provided_items_str)
-        self.num_psus.set(num_psus)
-        self.result_dict.set(result_str)
-        self.status.set("done with {} {} - ignored items: {}".format(self.algorithms[name], n_states, self.missing_items))
     
 
 
