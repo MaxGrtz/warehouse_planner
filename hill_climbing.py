@@ -15,7 +15,7 @@ class Hill_Climbing(algorithm.Algorithm):
     def run(self):
         '''
         method to run the algorithm from the constructed algrotihm object
-            returns: post precessed result - result state, decode dictionary, result psu dictionary, order list
+            returns: post precessed result - rovided items, number of psus required, result state
         '''
         # preprocess psu_dict - filter for relevant PSUs 
         psu_dict = self.pre_processing(self.psu_dict, self.order)
@@ -48,6 +48,7 @@ class Hill_Climbing(algorithm.Algorithm):
                     psu_dict - filtered dictionary of PSUs (key) and the nuerically encoded items they hold (value)
                     order - list of numerically encoded order
                     state - current state 
+        returns: least cost neighbor or False if no neighbor has lower cost than current state
         '''
         # calculate cost of all neighbors
         costs = [self.calculate_cost(neighbor, psu_dict, order) for neighbor in neighbors]

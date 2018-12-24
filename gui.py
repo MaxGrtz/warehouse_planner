@@ -52,8 +52,10 @@ class Gui(object):
 
         # initialize algorithm related buttons, labels and entry-fields
         input_lbl = Label(window, text="Algorithm Input", font=("Arial Bold", 15), width=20).grid(column=1, row=5)
-        self.n_states_parallel = Entry(window, width=20).grid(column=1, row=9) # input number of start states for parallel hill climbing
-        self.n_states_beam = Entry(window, width=20).grid(column=1, row=10) # input number of start states for local beam search
+        self.n_states_parallel = Entry(window, width=20) # input number of start states for parallel hill climbing
+        self.n_states_parallel.grid(column=1, row=9)
+        self.n_states_beam = Entry(window, width=20) # input number of start states for local beam search
+        self.n_states_beam.grid(column=1, row=10)
         algorithm_lbl = Label(window, text="Choose Algorithm", font=("Arial Bold", 15)).grid(column=2, row=5)
         btn_1 = Button(window, text=self.algorithms[1], command=lambda: self.choose_algorithm(1), width = 20).grid(column=2, row=6)
         btn_2 = Button(window, text=self.algorithms[2], command=lambda: self.choose_algorithm(2), width = 20).grid(column=2, row=7)
@@ -110,6 +112,7 @@ class Gui(object):
                         self.status.set("Invalid order, solved by ignoring following items, which are not in the inventory: {}".format(self.missing_items))
                     else:
                         self.status.set("")
+                        self.missing_items = "None"
                 else:
                     self.status.set("Please select an order file with the correct format and structure!")
                 # reset output labels to empty strings
@@ -124,10 +127,9 @@ class Gui(object):
     def choose_algorithm(self, name):
         '''
         method for choosing and calling the correct algorithm (depending on the button used to call the method)
-        given the outputs of the respective algortihms, the method updates the output labels of the GUI
+        given the outputs of the respective algorithms, the method updates the output labels of the GUI
         '''
-        self.status.set("running {} ...".format(self.algorithms[name]))
-        alg = None
+        n_states = ""
         if name == 1:
             # hill climbing
             alg = hill_climbing.Hill_Climbing(self.psu_dict, self.order, self.decode_dict)
@@ -142,18 +144,18 @@ class Gui(object):
             provided_items_str, num_psus, result_str = alg.run()
         elif name == 4:
             # parallel hill climbing with n start states
-            alg = parallel_hill_climbing.Parallel_Hill_Climbing(self.psu_dict, self.order, self.decode_dict, self.n_states_parallel)
-            provided_items_str, num_psus, result_str = alg.run()
+            alg = parallel_hill_climbing.Parallel_Hill_Climbing(self.psu_dict, self.order, self.decode_dict, self.n_states_parallel.get())
+            provided_items_str, num_psus, result_str, n_states = alg.run()
         elif name == 5:
             # local beam search with n start states
-            alg = local_beam_search.Local_Beam_Search(self.psu_dict, self.order, self.decode_dict, self.n_states_beam)
-            provided_items_str, num_psus, result_str = alg.run()
+            alg = local_beam_search.Local_Beam_Search(self.psu_dict, self.order, self.decode_dict, self.n_states_beam.get())
+            provided_items_str, num_psus, result_str, n_states = alg.run()
 
         # update labels with local search result
         self.provided_items.set(provided_items_str)
         self.num_psus.set(num_psus)
         self.result_dict.set(result_str)
-        self.status.set("done with {} - ignored items: {}".format(self.algorithms[name], self.missing_items))
+        self.status.set("done with {} {} - ignored items: {}".format(self.algorithms[name], n_states, self.missing_items))
     
 
 
