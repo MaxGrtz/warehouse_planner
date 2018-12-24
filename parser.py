@@ -30,7 +30,6 @@ def read_problem(path):
             # psu_dict: key - PSU id (row number), value - list of numerically encoded items in the row 
             psu_dict[c] = [encode_dict[item] for item in l.split(' ') if not item in '\n'] 
     except:
-        print("Please check if the selected file is a problem file with the correct format and structure!")
         return None, None, None # return None for encoding, decoding and psu dict if there is some problem with the chosen file
 
     return encode_dict, decode_dict, psu_dict
@@ -50,7 +49,6 @@ def read_order(path, encode_dict):
         with open(path, "r") as file:
             order = file.readlines()[0].split(' ')
     except:
-        print("Please check if the selected file is an order file with the correct format and structure!")
         return None, None  # return None for order and missing items lists if there is any problem when reading the file
 
     missing_items = []

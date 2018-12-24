@@ -73,10 +73,17 @@ class Gui(object):
         '''
         # read file via filedialog
         problem = filedialog.askopenfilename(filetypes=[("problemfiles", "*.txt")]) 
+        # reset order, problem path and status
+        self.order = None
+        self.order_file_name.set("Order FilePath")
+        self.problem_file_name.set("Problem FilePath")
+        self.status.set("")
         # parse the problem file to create encoding, decoding and psu doctionaries
         self.encode_dict, self.decode_dict, self.psu_dict = parser.read_problem(problem)   
         if not self.encode_dict is None:
             self.problem_file_name.set("..." + problem[-19:]) # set label to filename
+        else:
+            self.status.set("Please select a problem file with the correct format and structure!")
         # reset output labels to empty strings
         self.provided_items.set("")
         self.num_psus.set("")
@@ -90,22 +97,29 @@ class Gui(object):
             - missing_items: list of items from the order which are not in the inventory of the given problem.txt file
         '''
         # if there is an encoding dict - ie. a problem is already loaded, initiate filedialog for order file
-        if not self.encode_dict is None:
-            # read the order file via filedoalog
-            order = filedialog.askopenfilename(filetypes=[("orderfiles", "*.txt")])
-            # parse the order file to get numerically encoded order and filter out items that are not in the inventory
-            self.order, self.missing_items = parser.read_order(order, self.encode_dict)
-            if not self.order is None:
-                self.order_file_name.set("..." + order[-18:]) # set label to filename
-                if self.missing_items:
-                    # show items that are not in the inventory in the status label
-                    self.status.set("Invalid order, solved by ignoring following items, which are not in the inventory: {}".format(self.missing_items))
+        try:
+            if not self.encode_dict is None:
+                # read the order file via filedoalog
+                order = filedialog.askopenfilename(filetypes=[("orderfiles", "*.txt")])
+                # parse the order file to get numerically encoded order and filter out items that are not in the inventory
+                self.order, self.missing_items = parser.read_order(order, self.encode_dict)
+                if not self.order is None:
+                    self.order_file_name.set("..." + order[-18:]) # set label to filename
+                    if self.missing_items:
+                        # show items that are not in the inventory in the status label
+                        self.status.set("Invalid order, solved by ignoring following items, which are not in the inventory: {}".format(self.missing_items))
+                    else:
+                        self.status.set("")
                 else:
-                    self.status.set("")
-            # reset output labels to empty strings
-            self.provided_items.set("")
-            self.num_psus.set("")
-            self.result_dict.set("")
+                    self.status.set("Please select an order file with the correct format and structure!")
+                # reset output labels to empty strings
+                self.provided_items.set("")
+                self.num_psus.set("")
+                self.result_dict.set("")
+        except AttributeError:
+            self.status.set("Please select a problem file first!")
+
+            
 
     def choose_algorithm(self, name):
         '''
@@ -113,6 +127,7 @@ class Gui(object):
         given the outputs of the respective algortihms, the method updates the output labels of the GUI
         '''
         self.status.set("running {} ...".format(self.algorithms[name]))
+        alg = None
         if name == 1:
             # hill climbing
             alg = hill_climbing.Hill_Climbing(self.psu_dict, self.order, self.decode_dict)

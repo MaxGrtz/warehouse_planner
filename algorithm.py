@@ -18,22 +18,23 @@ class Algorithm(object):
         filter psu_dict for relevant psus (psus that contain at least one item from the order)
             parameters: psu_dict - complete dictionary of PSUs (key) and the nuerically encoded items they hold (value)
                         order - list of numerically encoded order
-            returns: filtered psu_dict - only PSUs that contain at leat one relevant item for the order
+            returns: filtered_psu_dict - only PSUs that contain at leat one relevant item for the order
         '''
+        filtered_psu_dict = psu_dict.copy()
         useless_psu = []
-        for psu in psu_dict.keys():
+        for psu in filtered_psu_dict.keys():
             flag = False
             for item in order:
-                if item in psu_dict[psu]:
+                if item in filtered_psu_dict[psu]:
                     flag = True
                     break
             if flag == False:
                 useless_psu.append(psu)
 
         for psu in useless_psu:
-            psu_dict.pop(psu)
-        psu_dict[0] = []
-        return psu_dict
+            filtered_psu_dict.pop(psu)
+        filtered_psu_dict[0] = []
+        return filtered_psu_dict
 
     def get_initial_state(self, psu_dict, order):
         '''
