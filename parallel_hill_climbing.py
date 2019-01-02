@@ -1,6 +1,6 @@
-import hill_climbing
+import algorithm
 
-class Parallel_Hill_Climbing(hill_climbing.Hill_Climbing):
+class Parallel_Hill_Climbing(algorithm.Algorithm):
     '''
     Parallel hill climbing inherited from hill climbing - make use of method for getting least cost nieghbor
     '''

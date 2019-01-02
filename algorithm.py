@@ -95,6 +95,26 @@ class Algorithm(object):
         # calculate cost 
         cost = missing_items*10 + len(state[state!=0]) # missing items are counted 10 times compared to number of PSUs required
         return cost
+        
+    def get_min_cost_neighbor(self, neighbors, psu_dict, order, state):
+        '''
+        method to get neighbor with lowest cost 
+        parameters: neighbors - neighbors of current state
+                    psu_dict - filtered dictionary of PSUs (key) and the nuerically encoded items they hold (value)
+                    order - list of numerically encoded order
+                    state - current state 
+        returns: least cost neighbor or False if no neighbor has lower cost than current state
+        '''
+        # calculate cost of all neighbors
+        costs = [self.calculate_cost(neighbor, psu_dict, order) for neighbor in neighbors]
+        min_cost = np.amin(costs) # get minimum cost
+        idx = np.argmin(costs) # get neighbor index of minimum cost
+
+        # return neighbor with minimum cost or False if min_cost is not lower than current state cast
+        if min_cost < self.calculate_cost(state, psu_dict, order): 
+            return neighbors[idx]
+        else:
+            return False
 
     def post_processing(self, state, decode_dict, psu_dict, order):
         '''
