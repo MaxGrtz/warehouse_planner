@@ -29,13 +29,13 @@ class Gui(object):
         self.problem_file_name.set("Problem FilePath")
         self.order_file_name = StringVar() # contains the file name of the order.txt file chosen 
         self.order_file_name.set("Order FilePath")
-        file_label = Label(window, text="Input Files", font=("Arial Bold", 15)).grid(column=1, row=1)
+        Label(window, text="Input Files", font=("Arial Bold", 15)).grid(column=1, row=1)
         # problem button and label
-        problem_btn = Button(window, text="Browse problem .txt file", command=self.load_problem, width=20).grid(column=1, row=2)
-        problem_lbl = Label(window, textvariable=self.problem_file_name, width=20).grid(column=2, row=2)
+        Button(window, text="Browse problem .txt file", command=self.load_problem, width=20).grid(column=1, row=2)
+        Label(window, textvariable=self.problem_file_name, width=20).grid(column=2, row=2)
         # order button and label
-        order_btn = Button(window, text="Browse order .txt file", command=self.load_order, width=20).grid(column=1, row=3)        
-        order_lbl = Label(window, textvariable=self.order_file_name, width=20).grid(column=2, row=3)
+        Button(window, text="Browse order .txt file", command=self.load_order, width=20).grid(column=1, row=3)        
+        Label(window, textvariable=self.order_file_name, width=20).grid(column=2, row=3)
 
         # ouput variables and labels
         self.status = StringVar() # contains information about the status of the programm
@@ -46,32 +46,32 @@ class Gui(object):
         self.num_psus.set("")
         self.result_dict = StringVar() # contains all PSUs required for solution and the items they carry
         self.result_dict.set("")
-        solution_lbl = Label(window, text="Output", font=("Arial Bold", 15)).grid(column=4, row=1)
-        lbl_status = Label(window, textvariable=self.status).grid(column=4, row=2)
-        label_provided_items = Label(window, textvariable=self.provided_items).grid(column=4, row=4)
-        label_num_psu = Label(window, textvariable=self.num_psus).grid(column=4, row=5)
-        label_result_dict = Label(window, textvariable=self.result_dict, anchor=W, justify=LEFT).grid(column=4, row=7, rowspan=50, columnspan=5)
+        Label(window, text="Output", font=("Arial Bold", 15)).grid(column=4, row=1)
+        Label(window, textvariable=self.status).grid(column=4, row=2)
+        Label(window, textvariable=self.provided_items).grid(column=4, row=4)
+        Label(window, textvariable=self.num_psus).grid(column=4, row=5)
+        Label(window, textvariable=self.result_dict, anchor=W, justify=LEFT).grid(column=4, row=7, rowspan=50, columnspan=5)
 
         # initialize algorithm related buttons, labels and entry-fields
-        input_lbl = Label(window, text="Algorithm Input", font=("Arial Bold", 15), width=20).grid(column=1, row=5)
         self.n_states_parallel = Entry(window, width=20) # input number of start states for parallel hill climbing
         self.n_states_parallel.grid(column=1, row=9)
         self.n_states_beam = Entry(window, width=20) # input number of start states for local beam search
         self.n_states_beam.grid(column=1, row=10)
-        algorithm_lbl = Label(window, text="Choose Algorithm", font=("Arial Bold", 15)).grid(column=2, row=5)
-        btn_1 = Button(window, text=self.algorithms[1], command=lambda: self.choose_algorithm(1), width=20).grid(column=2, row=6)
-        btn_2 = Button(window, text=self.algorithms[2], command=lambda: self.choose_algorithm(2), width=20).grid(column=2, row=7)
-        btn_3 = Button(window, text=self.algorithms[3], command=lambda: self.choose_algorithm(3), width=20).grid(column=2, row=8)
-        btn_4 = Button(window, text=self.algorithms[4], command=lambda: self.choose_algorithm(4), width=20).grid(column=2, row=9)
-        btn_5 = Button(window, text=self.algorithms[5], command=lambda: self.choose_algorithm(5), width=20).grid(column=2, row=10)
-        btn_6 = Button(window, text="download comparison.csv", command=lambda: self.choose_algorithm(6), width=20).grid(column=2, row=12)
+        Label(window, text="Algorithm Input", font=("Arial Bold", 15), width=20).grid(column=1, row=5)
+        Label(window, text="Choose Algorithm", font=("Arial Bold", 15)).grid(column=2, row=5)
+        Button(window, text=self.algorithms[1], command=lambda: self.choose_algorithm(1), width=20).grid(column=2, row=6)
+        Button(window, text=self.algorithms[2], command=lambda: self.choose_algorithm(2), width=20).grid(column=2, row=7)
+        Button(window, text=self.algorithms[3], command=lambda: self.choose_algorithm(3), width=20).grid(column=2, row=8)
+        Button(window, text=self.algorithms[4], command=lambda: self.choose_algorithm(4), width=20).grid(column=2, row=9)
+        Button(window, text=self.algorithms[5], command=lambda: self.choose_algorithm(5), width=20).grid(column=2, row=10)
+        Button(window, text="download comparison.csv", command=lambda: self.choose_algorithm(6), width=20).grid(column=2, row=12)
         
 
     def load_problem(self):
         '''
         method to initiate filedialog for reading the selected problem.txt file
         creates encoding, decoding and psu dictionaries
-            - encoding_dict: dictinary for encoding item names into numeric values
+            - encoding_dict: dictionary for encoding item names into numeric values
             - decoding_dict: dictionary for decoding item names from numeric into string
             - psu_dict: dictionary with psu id as key and the list of items they carry as value 
         '''
@@ -84,7 +84,7 @@ class Gui(object):
         self.status.set("")
         # parse the problem file to create encoding, decoding and psu doctionaries
         self.encode_dict, self.decode_dict, self.psu_dict = parser.read_problem(problem)   
-        if not self.encode_dict is None:
+        if self.encode_dict is not None:
             self.problem_file_name.set("..." + problem[-19:]) # set label to filename
         else:
             self.status.set("Please select a problem file with the correct format and structure!")
@@ -102,12 +102,12 @@ class Gui(object):
         '''
         # if there is an encoding dict - ie. a problem is already loaded, initiate filedialog for order file
         try:
-            if not self.encode_dict is None:
+            if self.encode_dict is not None:
                 # read the order file via filedoalog
                 order = filedialog.askopenfilename(filetypes=[("orderfiles", "*.txt")])
                 # parse the order file to get numerically encoded order and filter out items that are not in the inventory
                 self.order, self.missing_items = parser.read_order(order, self.encode_dict)
-                if not self.order is None:
+                if self.order is not None:
                     self.order_file_name.set("..." + order[-18:]) # set label to filename
                     if self.missing_items:
                         # show items that are not in the inventory in the status label
@@ -168,7 +168,7 @@ class Gui(object):
                 self.result_dict.set(result_str)
                 self.status.set("done with {} {} - ignored items: {}".format(self.algorithms[name], n_states, self.missing_items))
         except:
-            self.status.set("Please select a problem and order file first!")
+            self.status.set("Please select valid problem and order files first!")
 
     
 

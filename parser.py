@@ -9,7 +9,7 @@ def read_problem(path):
 
     try: 
         if "problem" not in path:
-            raise NameError  # raise error if the name does not contain "problem"
+            raise NameError('name of file chosen does not contain "problem"')  # raise error if the name does not contain "problem"
         # open file
         with open(path, "r") as file:
             lines = file.readlines()
@@ -40,11 +40,11 @@ def read_order(path, encode_dict):
     helper method to read order file
     parameters: path - path of order.txt file
                 encode_dict - dict to encode items
-    returns: list of encoded items
+    returns: list of encoded order items and missing item (items not in the inventory)
     '''
     try:
         if "order" not in path:
-            raise NameError  # raise error if the selected path does not contain "order"
+            raise NameError('name of file chosen does not contain "order"')  # raise error if the selected path does not contain "order"
         # read order file
         with open(path, "r") as file:
             order = file.readlines()[0].split(' ')

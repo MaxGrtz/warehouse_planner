@@ -21,6 +21,7 @@ class Algorithm(object):
             returns: filtered_psu_dict - only PSUs that contain at leat one relevant item for the order
         '''
         filtered_psu_dict = psu_dict.copy()
+        # find useless psus from dict - psus that dont carry any item needed for the given order
         useless_psu = []
         for psu in filtered_psu_dict.keys():
             flag = False
@@ -31,6 +32,7 @@ class Algorithm(object):
             if flag == False:
                 useless_psu.append(psu)
 
+        # drop useless psus from dict and return filtered psu dict
         for psu in useless_psu:
             filtered_psu_dict.pop(psu)
         filtered_psu_dict[0] = []
@@ -39,7 +41,7 @@ class Algorithm(object):
     def get_initial_state(self, psu_dict, order):
         '''
         get a random initial state
-        parameters: psu_dict - complete dictionary of PSUs (key) and the nuerically encoded items they hold (value)
+        parameters: psu_dict - dictionary of PSUs (key) and the numerically encoded items they hold (value)
                     order - list of numerically encoded order
         returns: initial_state - random initial state as a list of length equal to the number of items in order 
                 --> idea: we need one PSU for every item in the order (worst case)
@@ -59,9 +61,9 @@ class Algorithm(object):
         '''
         get neighbors of current state
         parameters: state - current state (list of PSUs)
-                    psu_dict - filtered dictionary of PSUs (key) and the nuerically encoded items they hold (value)
+                    psu_dict - filtered dictionary of PSUs (key) and the numerically encoded items they hold (value)
         returns: neighbors - list of all neighboring states of the given current state
-                --> idea: neighboring states are state with only one PSU different from current state
+                --> idea: neighboring states are states with only one PSU different from current state
         '''
         neighbors = []
         for i in range(len(state)):
@@ -77,7 +79,7 @@ class Algorithm(object):
         '''
         calculate cost based on number of psus used and order items fulfilled/provided with current state
         parameters: state - current state (list of PSUs)
-                    psu_dict - filtered dictionary of PSUs (key) and the nuerically encoded items they hold (value)
+                    psu_dict - filtered dictionary of PSUs (key) and the numerically encoded items they hold (value)
                     order - list of numerically encoded order
         returns: cost - cost associated with current state based on number of PSUs (non zero PSUs ids in state) 
                         and number of provided items (items of order satisfied by current state)
@@ -85,7 +87,7 @@ class Algorithm(object):
         # get list of all unique items in the PSUs of the current state
         items_in_psus = list(set([item for psu in state for item in psu_dict[psu]]))
 
-        # count number of items of the order that are not in items_in_psus
+        # count number of items of the order that are not in items_in_psus (could also use length of difference set here)
         missing_items = 0
         for item in order:
             if item not in items_in_psus:
@@ -100,7 +102,7 @@ class Algorithm(object):
         '''
         method to get neighbor with lowest cost 
         parameters: neighbors - neighbors of current state
-                    psu_dict - filtered dictionary of PSUs (key) and the nuerically encoded items they hold (value)
+                    psu_dict - filtered dictionary of PSUs (key) and the numerically encoded items they hold (value)
                     order - list of numerically encoded order
                     state - current state 
         returns: least cost neighbor or False if no neighbor has lower cost than current state
@@ -110,7 +112,7 @@ class Algorithm(object):
         min_cost = np.amin(costs) # get minimum cost
         idx = np.argmin(costs) # get neighbor index of minimum cost
 
-        # return neighbor with minimum cost or False if min_cost is not lower than current state cast
+        # return neighbor with minimum cost or False if min_cost is not lower than current state cost
         if min_cost < self.calculate_cost(state, psu_dict, order): 
             return neighbors[idx]
         else:
@@ -121,7 +123,7 @@ class Algorithm(object):
         transform results to strings for output
         parameters: state - result state (list of PSUs)
                     decode_dict - dictionary for decoding numeric items
-                    psu_dict - filtered dictionary of PSUs (key) and the nuerically encoded items they hold (value)
+                    psu_dict - filtered dictionary of PSUs (key) and the numerically encoded items they hold (value)
                     order - list of numerically encoded order
         returns: provided_items_str - string to summarize number of items of order that are satisfied
                  num_psus - number of non zero PSUs in state (where 0 is placeholder for no PSU)
@@ -131,7 +133,7 @@ class Algorithm(object):
         num_psus = "Number of PSUs required: " + str(len(state[state!=0]))
 
         # create result dict - PSUs of result state (keys) and decoded items they carry (values)
-        # item that are in the order are casted to upper case for emphasis
+        # items that are in the order are casted to upper case for emphasis
         result_dict = {}
         for psu in state:
                 result_dict[psu] = [decode_dict[item].upper() if item in order else decode_dict[item] for item in psu_dict[psu]]
