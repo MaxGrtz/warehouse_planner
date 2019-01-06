@@ -10,7 +10,6 @@ try:
 except:
     print('tried to install dependencies but failed, please update your python and pip versions!')
     print('alternatively ignore this message and install dependencies yourself')
-    print(stderr)
 
 # run application
 window = Tk()
