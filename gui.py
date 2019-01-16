@@ -1,6 +1,6 @@
 from tkinter import Tk, Frame, Label, Button, Entry, GROOVE, N,S, W, LEFT, StringVar
 from tkinter import filedialog
-import parser, hill_climbing, first_choice_hill_climbing, simulated_annealing, parallel_hill_climbing, local_beam_search, comparator
+import file_parser, hill_climbing, first_choice_hill_climbing, simulated_annealing, parallel_hill_climbing, local_beam_search, comparator
 import time
 
 class Gui(object):
@@ -83,7 +83,7 @@ class Gui(object):
         self.problem_file_name.set("Problem FilePath")
         self.status.set("")
         # parse the problem file to create encoding, decoding and psu doctionaries
-        self.encode_dict, self.decode_dict, self.psu_dict = parser.read_problem(problem)   
+        self.encode_dict, self.decode_dict, self.psu_dict = file_parser.read_problem(problem)   
         if self.encode_dict is not None:
             self.problem_file_name.set("..." + problem[-19:]) # set label to filename
         else:
@@ -106,7 +106,7 @@ class Gui(object):
                 # read the order file via filedoalog
                 order = filedialog.askopenfilename(filetypes=[("orderfiles", "*.txt")])
                 # parse the order file to get numerically encoded order and filter out items that are not in the inventory
-                self.order, self.missing_items = parser.read_order(order, self.encode_dict)
+                self.order, self.missing_items = file_parser.read_order(order, self.encode_dict)
                 if self.order is not None:
                     self.order_file_name.set("..." + order[-18:]) # set label to filename
                     if self.missing_items:
