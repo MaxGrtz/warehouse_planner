@@ -2,6 +2,7 @@ from tkinter import Tk, Frame, Label, Button, Entry, GROOVE, N,S, W, LEFT, Strin
 from tkinter import filedialog
 import file_parser, hill_climbing, first_choice_hill_climbing, simulated_annealing, parallel_hill_climbing, local_beam_search, comparator
 import time
+import numpy as np
 
 class Gui(object):
 
@@ -121,10 +122,11 @@ class Gui(object):
                 self.provided_items.set("")
                 self.num_psus.set("")
                 self.result_dict.set("")
+                # preprocess psu_dict
+                self.filtered_psu_dict = self.pre_processing(self.psu_dict, self.order)
         except AttributeError:
             self.status.set("Please select a problem file first!")
 
-            
 
     def choose_algorithm(self, name):
         '''
@@ -132,45 +134,79 @@ class Gui(object):
         given the outputs of the respective algorithms, the method updates the output labels of the GUI
         '''
         try:
+            start = time.time()
             n_states = ""
             if name == 1:
                 # hill climbing
-                alg = hill_climbing.Hill_Climbing(self.psu_dict, self.order, self.decode_dict)
+                alg = hill_climbing.Hill_Climbing(self.filtered_psu_dict, self.order, self.decode_dict)
                 provided_items_str, num_psus, result_str = alg.run()
             elif name == 2:
                 # first choice hill climbing
-                alg = first_choice_hill_climbing.First_Choice_Hill_Climbing(self.psu_dict, self.order, self.decode_dict)
+                alg = first_choice_hill_climbing.First_Choice_Hill_Climbing(self.filtered_psu_dict, self.order, self.decode_dict)
                 provided_items_str, num_psus, result_str = alg.run()
             elif name == 3:
                 # simulated annealing
-                alg = simulated_annealing.Simulated_Annealing(self.psu_dict, self.order, self.decode_dict)
+                alg = simulated_annealing.Simulated_Annealing(self.filtered_psu_dict, self.order, self.decode_dict)
                 provided_items_str, num_psus, result_str = alg.run()
             elif name == 4:
                 # parallel hill climbing with n start states
-                alg = parallel_hill_climbing.Parallel_Hill_Climbing(self.psu_dict, self.order, self.decode_dict, self.n_states_parallel.get())
+                alg = parallel_hill_climbing.Parallel_Hill_Climbing(self.filtered_psu_dict, self.order, self.decode_dict, self.n_states_parallel.get())
                 provided_items_str, num_psus, result_str, n_states = alg.run()
             elif name == 5:
                 # local beam search with n start states
-                alg = local_beam_search.Local_Beam_Search(self.psu_dict, self.order, self.decode_dict, self.n_states_beam.get())
+                alg = local_beam_search.Local_Beam_Search(self.filtered_psu_dict, self.order, self.decode_dict, self.n_states_beam.get())
                 provided_items_str, num_psus, result_str, n_states = alg.run()
             elif name == 6:
-                comparison = comparator.Comparator(self.psu_dict, self.order, self.decode_dict)
+                comparison = comparator.Comparator(self.filtered_psu_dict, self.order, self.decode_dict)
                 comparison.compare_all()
                 path = filedialog.asksaveasfilename(defaultextension=".csv")
                 comparison.download(path)
-                        
+            
+            end = time.time()
+            duration = "  [duration: " + str(np.round(end-start, decimals=4)) + " sec.]"
             # update labels with local search result
             if name == 6:
                 self.status.set("done with Comparison - downloaded to: {}...{}".format(path[:30],path[-30:]))
+                self.provided_items.set("")
+                self.num_psus.set("")
+                self.result_dict.set("")
             else:
-                self.provided_items.set(provided_items_str)
+                self.status.set("done with {} {} - ignored items: {}".format(self.algorithms[name], n_states, self.missing_items))
+                self.provided_items.set(provided_items_str + duration)
                 self.num_psus.set(num_psus)
                 self.result_dict.set(result_str)
-                self.status.set("done with {} {} - ignored items: {}".format(self.algorithms[name], n_states, self.missing_items))
         except:
             self.status.set("Please select valid problem and order files first!")
 
-    
+
+    def pre_processing(self, psu_dict, order):
+        '''
+        filter psu_dict for relevant psus (psus that contain at least one item from the order) and item (only items that are in the order)
+            parameters: psu_dict - complete dictionary of PSUs (key) and the numerically encoded items they hold (value)
+                        order - list of numerically encoded order
+            returns: filtered_psu_dict - only PSUs that contain at leat one relevant item for the order
+        '''
+        filtered_psu_dict = psu_dict.copy()
+        # find useless psus from dict - psus that dont carry any item needed for the given order
+        useless_psu = []
+        for psu in filtered_psu_dict.keys():
+            flag = False
+            for item in order:
+                if item in filtered_psu_dict[psu]:
+                    flag = True
+                    break
+            if flag == False:
+                useless_psu.append(psu)
+
+        # drop useless psus from dict and return filtered psu dict
+        for psu in useless_psu:
+            filtered_psu_dict.pop(psu)
+        filtered_psu_dict[0] = []
+
+        # drop all items that are not in the order list
+        for k,v in filtered_psu_dict.items():
+            filtered_psu_dict[k] = [item for item in v if item in order]
+        return filtered_psu_dict
 
 
 

@@ -27,9 +27,7 @@ class Local_Beam_Search(algorithm.Algorithm):
         method to run the algorithm from the constructed algrotihm object
             returns: post precessed result - provided items, number of psus required, result state, number of initial states
         '''
-
-        # preprocess psu_dict - filter for relevant PSUs 
-        psu_dict = self.pre_processing(self.psu_dict, self.order)
+        psu_dict = self.psu_dict
 
         # random initial states
         states = [self.get_initial_state(psu_dict, self.order) for _ in range(self.num_start_states)]

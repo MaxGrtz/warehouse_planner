@@ -18,9 +18,8 @@ class Hill_Climbing(algorithm.Algorithm):
         method to run the algorithm from the constructed algorithm object
             parameter: state - state from which to start hill-climbing, None is default, results in random start state
             returns: post precessed result - provided items, number of psus required, result state
-        '''
-        # preprocess psu_dict - filter for relevant PSUs 
-        psu_dict = self.pre_processing(self.psu_dict, self.order)
+        ''' 
+        psu_dict = self.psu_dict
 
         # get random initial state 
         if state is None:

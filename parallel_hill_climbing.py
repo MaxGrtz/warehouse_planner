@@ -30,8 +30,7 @@ class Parallel_Hill_Climbing(algorithm.Algorithm):
         method to run the algorithm from the constructed algrithm object
             returns: post precessed result - provided items, number of psus required, result state, number of initial states
         '''
-        # preprocess psu_dict - filter for relevant PSUs 
-        psu_dict = self.pre_processing(self.psu_dict, self.order)
+        psu_dict = self.psu_dict
 
         results = []
         for i in range(self.num_start_states):

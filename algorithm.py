@@ -12,31 +12,6 @@ class Algorithm(object):
         self.psu_dict = psu_dict
         self.order = order
         self.decode_dict = decode_dict
-    
-    def pre_processing(self, psu_dict, order):
-        '''
-        filter psu_dict for relevant psus (psus that contain at least one item from the order)
-            parameters: psu_dict - complete dictionary of PSUs (key) and the nuerically encoded items they hold (value)
-                        order - list of numerically encoded order
-            returns: filtered_psu_dict - only PSUs that contain at leat one relevant item for the order
-        '''
-        filtered_psu_dict = psu_dict.copy()
-        # find useless psus from dict - psus that dont carry any item needed for the given order
-        useless_psu = []
-        for psu in filtered_psu_dict.keys():
-            flag = False
-            for item in order:
-                if item in filtered_psu_dict[psu]:
-                    flag = True
-                    break
-            if flag == False:
-                useless_psu.append(psu)
-
-        # drop useless psus from dict and return filtered psu dict
-        for psu in useless_psu:
-            filtered_psu_dict.pop(psu)
-        filtered_psu_dict[0] = []
-        return filtered_psu_dict
 
     def get_initial_state(self, psu_dict, order):
         '''
@@ -136,7 +111,7 @@ class Algorithm(object):
         # items that are in the order are casted to upper case for emphasis
         result_dict = {}
         for psu in state:
-                result_dict[psu] = [decode_dict[item].upper() if item in order else decode_dict[item] for item in psu_dict[psu]]
+                result_dict[psu] = [decode_dict[item] for item in psu_dict[psu]]
         
         # create set of items of the order that are provided by the result state PSUs 
         provided_items = set([item for psu in state for item in psu_dict[psu] if item in order])
@@ -145,7 +120,7 @@ class Algorithm(object):
         result_str = ""
         for psu in state:
             if psu != 0:
-                result_str += str(psu) + ": "
+                result_str += str(psu) + ":\t"
                 for item in result_dict[psu]:
                     result_str += item + ", "
                 result_str = result_str[:-2] + " \n"

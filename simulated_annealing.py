@@ -16,8 +16,7 @@ class Simulated_Annealing(algorithm.Algorithm):
         method to run the algorithm from the constructed algorithm object
             returns: post precessed result - provided items, number of psus required, result state
         '''
-        # preprocess psu_dict - filter for relevant PSUs 
-        psu_dict = self.pre_processing(self.psu_dict, self.order)
+        psu_dict = self.psu_dict
 
         # get random initial state 
         state = self.get_initial_state(psu_dict, self.order)
