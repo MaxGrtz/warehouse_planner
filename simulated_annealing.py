@@ -38,7 +38,7 @@ class Simulated_Annealing(algorithm.Algorithm):
                 state = next_state
             else:
                 # else update with some probability
-                if np.random.random() < np.exp(delta/temp):
+                if np.random.random() <= np.exp(delta/temp):
                     state = next_state
             
             temp -= 1

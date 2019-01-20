@@ -34,15 +34,11 @@ class First_Choice_Hill_Climbing(algorithm.Algorithm):
                 if nb_cost < current_cost:
                     state = nb
                     updated = True 
+                    break
 
             if not updated:
                 flag = False
             
-
-                    
-            
-            
-
         # return postpreocessed result
         return self.post_processing(state, self.decode_dict, psu_dict, self.order)
             

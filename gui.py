@@ -1,6 +1,6 @@
 from tkinter import Tk, Frame, Label, Button, Entry, GROOVE, N,S, W, LEFT, StringVar
 from tkinter import filedialog
-import file_parser, hill_climbing, first_choice_hill_climbing, simulated_annealing, parallel_hill_climbing, local_beam_search, comparator
+import file_parser, hill_climbing, first_choice_hill_climbing, simulated_annealing, random_restart_hill_climbing, local_beam_search, comparator
 import time
 import numpy as np
 
@@ -60,12 +60,12 @@ class Gui(object):
         self.n_states_beam.grid(column=1, row=10)
         Label(window, text="Algorithm Input", font=("Arial Bold", 15), width=20).grid(column=1, row=5)
         Label(window, text="Choose Algorithm", font=("Arial Bold", 15)).grid(column=2, row=5)
-        Button(window, text=self.algorithms[1], command=lambda: self.choose_algorithm(1), width=20).grid(column=2, row=6)
-        Button(window, text=self.algorithms[2], command=lambda: self.choose_algorithm(2), width=20).grid(column=2, row=7)
-        Button(window, text=self.algorithms[3], command=lambda: self.choose_algorithm(3), width=20).grid(column=2, row=8)
-        Button(window, text=self.algorithms[4], command=lambda: self.choose_algorithm(4), width=20).grid(column=2, row=9)
-        Button(window, text=self.algorithms[5], command=lambda: self.choose_algorithm(5), width=20).grid(column=2, row=10)
-        Button(window, text="download comparison.csv", command=lambda: self.choose_algorithm(6), width=20).grid(column=2, row=12)
+        Button(window, text=self.algorithms[1], command=lambda: self.choose_algorithm(1), width=25).grid(column=2, row=6)
+        Button(window, text=self.algorithms[2], command=lambda: self.choose_algorithm(2), width=25).grid(column=2, row=7)
+        Button(window, text=self.algorithms[3], command=lambda: self.choose_algorithm(3), width=25).grid(column=2, row=8)
+        Button(window, text=self.algorithms[4], command=lambda: self.choose_algorithm(4), width=25).grid(column=2, row=9)
+        Button(window, text=self.algorithms[5], command=lambda: self.choose_algorithm(5), width=25).grid(column=2, row=10)
+        Button(window, text="download comparison.csv", command=lambda: self.choose_algorithm(6), width=25).grid(column=2, row=12)
         
 
     def load_problem(self):
@@ -150,7 +150,7 @@ class Gui(object):
                 provided_items_str, num_psus, result_str = alg.run()
             elif name == 4:
                 # parallel hill climbing with n start states
-                alg = parallel_hill_climbing.Parallel_Hill_Climbing(self.filtered_psu_dict, self.order, self.decode_dict, self.n_states_parallel.get())
+                alg = random_restart_hill_climbing.Random_Restart_Hill_Climbing(self.filtered_psu_dict, self.order, self.decode_dict, self.n_states_parallel.get())
                 provided_items_str, num_psus, result_str, n_states = alg.run()
             elif name == 5:
                 # local beam search with n start states

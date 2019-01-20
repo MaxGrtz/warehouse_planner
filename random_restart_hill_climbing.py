@@ -1,8 +1,8 @@
 import algorithm
 
-class Parallel_Hill_Climbing(algorithm.Algorithm):
+class Random_Restart_Hill_Climbing(algorithm.Algorithm):
     '''
-    Parallel hill climbing inherited from hill climbing - make use of method for getting least cost nieghbor
+    Random restart hill climbing inherited from hill climbing - make use of method for getting least cost nieghbor
     '''
     
     def __init__(self, psu_dict, order, decode_dict, num_start_states):
@@ -10,7 +10,7 @@ class Parallel_Hill_Climbing(algorithm.Algorithm):
         initialize algorithm object with psu_dict, order list and dict to decode items via parent class
         '''
         super().__init__(psu_dict, order, decode_dict)
-        self.name = "Parallel Hill Climbing"
+        self.name = "Random Restart Hill Climbing"
         self.default = False
         try: 
             self.num_start_states = int(num_start_states.replace(" ", ""))
