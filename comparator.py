@@ -13,17 +13,21 @@ class Comparator(object):
         self.decode_dict = decode_dict
 
     def compare_all(self):
+        psu_dict = self.psu_dict
+        order = self.order
+        decode_dict = self.decode_dict
+
         # create algorithm instances 
-        hill_climbing_alg = hill_climbing.Hill_Climbing(self.psu_dict, self.order, self.decode_dict)
-        first_choice_hill_climbing_alg = first_choice_hill_climbing.First_Choice_Hill_Climbing(self.psu_dict, self.order, self.decode_dict)
-        simulated_annealing_alg = simulated_annealing.Simulated_Annealing(self.psu_dict, self.order, self.decode_dict)
+        hill_climbing_alg = hill_climbing.Hill_Climbing(psu_dict, order, decode_dict)
+        first_choice_hill_climbing_alg = first_choice_hill_climbing.First_Choice_Hill_Climbing(psu_dict, order, decode_dict)
+        simulated_annealing_alg = simulated_annealing.Simulated_Annealing(psu_dict, order, decode_dict)
         algorithms = [hill_climbing_alg, first_choice_hill_climbing_alg, simulated_annealing_alg]
         n_start_states = ["25","50","75","100"]  # algorithm instances with different number of start states
         for n in n_start_states:
-            algorithms.append(random_restart_hill_climbing.Random_Restart_Hill_Climbing(self.psu_dict, self.order, self.decode_dict, n))
+            algorithms.append(random_restart_hill_climbing.Random_Restart_Hill_Climbing(psu_dict, order, decode_dict, n))
             
         for n in n_start_states:
-            algorithms.append(local_beam_search.Local_Beam_Search(self.psu_dict, self.order, self.decode_dict, n))
+            algorithms.append(local_beam_search.Local_Beam_Search(psu_dict, order, decode_dict, n))
 
         # create comparison result dict
         result_dict = {}

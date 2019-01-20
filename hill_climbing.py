@@ -20,10 +20,12 @@ class Hill_Climbing(algorithm.Algorithm):
             returns: post precessed result - provided items, number of psus required, result state
         ''' 
         psu_dict = self.psu_dict
+        order = self.order
+        decode_dict = self.decode_dict
 
         # get random initial state 
         if state is None:
-            state = self.get_initial_state(psu_dict, self.order)
+            state = self.get_initial_state(psu_dict, order)
 
         # actual algorithm
         # in every iteration get neighbors of current state and select neighbor with lowest cost
@@ -34,10 +36,10 @@ class Hill_Climbing(algorithm.Algorithm):
             neighbors = self.get_neighbors(state, psu_dict) 
 
             # get lowest cost neighbor or False if there is no neighbor with lower cost than current state
-            result = self.get_min_cost_neighbor(neighbors, psu_dict, self.order, state) 
-            if result == False:
+            result = self.get_min_cost_neighbor(neighbors, psu_dict, order, state) 
+            if not result:
                 flag = False
             else:
                 state = result # update state with new state 
         # return postpreocessed result
-        return self.post_processing(state, self.decode_dict, psu_dict, self.order)
+        return self.post_processing(state, decode_dict, psu_dict, order)

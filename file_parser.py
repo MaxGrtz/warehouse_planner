@@ -14,7 +14,7 @@ def read_problem(path):
         with open(path, "r") as file:
             lines = file.readlines()
 
-        # create encoding and decoding dictionaries
+        # create items list, encoding and decoding dictionaries
         items = lines.pop(0).split(' ')[:-1]  # pop the inventory list line and safe in items
         encode_dict = {}
         decode_dict = {}
@@ -49,11 +49,11 @@ def read_order(path, encode_dict):
         with open(path, "r") as file:
             order = file.readlines()[0].split(' ')
     except:
-        return None, None  # return None for order and missing items lists if there is any problem when reading the file
+        return None, None # return None for order and missing items lists if there is any problem when reading the file
 
     missing_items = []
-    # encode items in order list, append item which are not in the dictionary (ie. not in the inventory)
+    # encode items in order list, append items which are not in the dictionary (ie. not in the inventory) to missing_items
     order = [encode_dict[item] if item in encode_dict else missing_items.append(item) for item in order]
-    order = [item for item in order if item is not None] # filter out None values from order list
+    order = [item for item in order if item is not None] # filter out None values from order list (due to append returning None)
 
     return order, missing_items

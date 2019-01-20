@@ -1,4 +1,5 @@
 import numpy as np
+import random
 
 class Algorithm(object):
     '''
@@ -21,16 +22,8 @@ class Algorithm(object):
         returns: initial_state - random initial state as a list of length equal to the number of items in order 
                 --> idea: we need one PSU for every item in the order (worst case)
         '''
-        flag = False
-        while not flag:
-            # initial_state_idx - list of indices to get PSUs from psu_dict key list
-            initial_state_idx = np.random.randint(0,len(psu_dict), len(order))
-            if len(set(initial_state_idx)) == len(order):  # check if every PSU is in the list only once
-                flag = True
+        return random.sample(list(psu_dict.keys()), len(order)) 
 
-        # get inital state by getting the PSUs from psu_dict key list by initial_state_idx list
-        initial_state = [list(psu_dict.keys())[idx] for idx in initial_state_idx]
-        return initial_state
 
     def get_neighbors(self, state, psu_dict):
         '''
@@ -41,14 +34,14 @@ class Algorithm(object):
                 --> idea: neighboring states are states with only one PSU different from current state
         '''
         neighbors = []
+        # for every position in the state
         for i in range(len(state)):
-            for psu in psu_dict.keys():
-                if psu != state[i]:
-                    temp_state = state.copy()
-                    temp_state[i] = psu
-                    neighbors.append(temp_state)
-        np.random.shuffle(neighbors) # get some randomness into the neighbor list 
-        return neighbors
+            # every variation from the current psu at that state position is a neighbor of the current state
+            for psu in psu_dict:
+                temp_state = state.copy()
+                temp_state[i] = psu
+                neighbors.append(temp_state)
+        return neighbors 
 
     def calculate_cost(self, state, psu_dict, order):
         '''
@@ -56,22 +49,15 @@ class Algorithm(object):
         parameters: state - current state (list of PSUs)
                     psu_dict - filtered dictionary of PSUs (key) and the numerically encoded items they hold (value)
                     order - list of numerically encoded order
-        returns: cost - cost associated with current state based on number of PSUs (non zero PSUs ids in state) 
+        returns: cost - cost associated with current state based on number of PSUs (non zero PSU ids in state) 
                         and number of provided items (items of order satisfied by current state)
         '''
-        # get list of all unique items in the PSUs of the current state
-        items_in_psus = list(set([item for psu in state for item in psu_dict[psu]]))
+        # get number of items of the order that are not the items provided by the psus
+        missing_items = len(set(order) - set([item for psu in state for item in psu_dict[psu]]))
 
-        # count number of items of the order that are not in items_in_psus (could also use length of difference set here)
-        missing_items = 0
-        for item in order:
-            if item not in items_in_psus:
-                missing_items += 1
-        state = np.asarray(state)
-
-        # calculate cost 
-        cost = missing_items*10 + len(state[state!=0]) # missing items are counted 10 times compared to number of PSUs required
-        return cost
+        state = np.asarray(state) # for easier indexing
+        # calculate cost - missing items are counted 10 times compared to number of PSUs required
+        return missing_items*10 + len(state[state!=0])
         
     def get_min_cost_neighbor(self, neighbors, psu_dict, order, state):
         '''
@@ -83,15 +69,13 @@ class Algorithm(object):
         returns: least cost neighbor or False if no neighbor has lower cost than current state
         '''
         # calculate cost of all neighbors
-        costs = [self.calculate_cost(neighbor, psu_dict, order) for neighbor in neighbors]
+        costs = [self.calculate_cost(nb, psu_dict, order) for nb in neighbors]
         min_cost = np.amin(costs) # get minimum cost
         idx = np.argmin(costs) # get neighbor index of minimum cost
 
         # return neighbor with minimum cost or False if min_cost is not lower than current state cost
-        if min_cost < self.calculate_cost(state, psu_dict, order): 
-            return neighbors[idx]
-        else:
-            return False
+        return neighbors[idx] if min_cost < self.calculate_cost(state, psu_dict, order) else False
+    
 
     def post_processing(self, state, decode_dict, psu_dict, order):
         '''
@@ -103,27 +87,18 @@ class Algorithm(object):
         returns: provided_items_str - string to summarize number of items of order that are satisfied
                  num_psus - number of non zero PSUs in state (where 0 is placeholder for no PSU)
         '''
-        state = np.asarray(state)
         # get number of non zero PSUs in state (where 0 is placeholder for no PSU) 
-        num_psus = "Number of PSUs required: " + str(len(state[state!=0]))
+        state = np.asarray(state)
+        num_psus = "Number of PSUs required: {}".format(len(state[state!=0]))
 
         # create result dict - PSUs of result state (keys) and decoded items they carry (values)
-        # items that are in the order are casted to upper case for emphasis
-        result_dict = {}
-        for psu in state:
-                result_dict[psu] = [decode_dict[item] for item in psu_dict[psu]]
+        result_dict = {psu: [decode_dict[item] for item in psu_dict[psu]] for psu in state}
         
-        # create set of items of the order that are provided by the result state PSUs 
-        provided_items = set([item for psu in state for item in psu_dict[psu] if item in order])
+        # get number of items of the order that are provided by the result state PSUs 
+        provided_items = set([item for psu in state for item in psu_dict[psu]])
 
         # create a string from result_dict - every line one PSU with its items 
-        result_str = ""
-        for psu in state:
-            if psu != 0:
-                result_str += str(psu) + ":\t"
-                for item in result_dict[psu]:
-                    result_str += item + ", "
-                result_str = result_str[:-2] + " \n"
+        result_str = "".join([str(psu) + ":\t" + "".join([item+", " for item in result_dict[psu]])[:-2] + " \n" for psu in state if psu != 0])
         
         # create string to summarize number of items of order that are satisfied
         provided_items_str = "Provided Items: {}/{}".format(len(provided_items), len(order))

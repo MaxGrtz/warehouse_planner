@@ -56,7 +56,7 @@ class Random_Restart_Hill_Climbing(algorithm.Algorithm):
 
         # get result from list with lowest cost
         min_cost_state = self.get_min_cost_neighbor(results, psu_dict, self.order, results[0])
-        if min_cost_state == False:
+        if not min_cost_state:
             min_cost_state = results[0]
         # return postprocessed results
         provided_items_str, num_psus, result_str = self.post_processing(min_cost_state, self.decode_dict, psu_dict, self.order)
