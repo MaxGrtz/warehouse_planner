@@ -1,4 +1,4 @@
-import hill_climbing, first_choice_hill_climbing, simulated_annealing, parallel_hill_climbing, local_beam_search
+import hill_climbing, first_choice_hill_climbing, simulated_annealing, random_restart_hill_climbing, local_beam_search
 import time
 import pandas as pd
 import numpy as np
@@ -20,7 +20,7 @@ class Comparator(object):
         algorithms = [hill_climbing_alg, first_choice_hill_climbing_alg, simulated_annealing_alg]
         n_start_states = ["25","50","75","100"]  # algorithm instances with different number of start states
         for n in n_start_states:
-            algorithms.append(parallel_hill_climbing.Parallel_Hill_Climbing(self.psu_dict, self.order, self.decode_dict, n))
+            algorithms.append(random_restart_hill_climbing.Random_Restart_Hill_Climbing(self.psu_dict, self.order, self.decode_dict, n))
             
         for n in n_start_states:
             algorithms.append(local_beam_search.Local_Beam_Search(self.psu_dict, self.order, self.decode_dict, n))

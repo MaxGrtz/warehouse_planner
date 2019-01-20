@@ -1,16 +1,17 @@
 import algorithm
+import numpy as np
 
-class Parallel_Hill_Climbing(algorithm.Algorithm):
+class Random_Restart_Hill_Climbing(algorithm.Algorithm):
     '''
-    Parallel hill climbing inherited from hill climbing - make use of method for getting least cost nieghbor
+    Random restart hill climbing inherited from hill climbing - make use of method for getting least cost nieghbor
     '''
     
-    def __init__(self, psu_dict, order, decode_dict, num_start_states):
+    def __init__(self, psu_dict, order, decode_dict, num_start_states, item_overview):
         '''
         initialize algorithm object with psu_dict, order list and dict to decode items via parent class
         '''
-        super().__init__(psu_dict, order, decode_dict)
-        self.name = "Parallel Hill Climbing"
+        super().__init__(psu_dict, order, decode_dict, item_overview)
+        self.name = "Random Restart Hill Climbing"
         self.default = False
         try: 
             self.num_start_states = int(num_start_states.replace(" ", ""))
@@ -30,12 +31,15 @@ class Parallel_Hill_Climbing(algorithm.Algorithm):
         method to run the algorithm from the constructed algrithm object
             returns: post precessed result - provided items, number of psus required, result state, number of initial states
         '''
+        item_overview = self.item_overview
         psu_dict = self.psu_dict
+        order = self.order
+        decode_dict = self.decode_dict
 
         results = []
         for i in range(self.num_start_states):
             # get random initial state 
-            state = self.get_initial_state(psu_dict, self.order)
+            state = self.get_initial_state(item_overview)
 
             # actual algorithm
             # in every iteration get neighbors of current state and select neighbor with lowest cost
@@ -43,23 +47,22 @@ class Parallel_Hill_Climbing(algorithm.Algorithm):
             flag = True
             while flag:
                 # get nieghbors of current state
-                neighbors = self.get_neighbors(state, psu_dict) 
+                neighbors = self.get_neighbors(state) 
 
                 # get lowest cost neighbor or False if there is no neighbor with lower cost than current state
-                new_state = self.get_min_cost_neighbor(neighbors, psu_dict, self.order, state) 
-                if new_state == False:
-                    flag = False
+                new_state = self.get_min_cost_neighbor(item_overview, neighbors, order, state) 
+                if np.all(new_state == state):
+                    flag = False 
                 else:
                     state = new_state # update state with new state 
             # safe result state for iteration
             results.append(state)
 
         # get result from list with lowest cost
-        min_cost_state = self.get_min_cost_neighbor(results, psu_dict, self.order, results[0])
-        if min_cost_state == False:
-            min_cost_state = results[0]
+        min_cost_state = self.get_min_cost_neighbor(item_overview, results, order, results[0])
+
         # return postprocessed results
-        provided_items_str, num_psus, result_str = self.post_processing(min_cost_state, self.decode_dict, psu_dict, self.order)
+        provided_items_str, num_psus, result_str = self.post_processing(min_cost_state, decode_dict, item_overview, order, psu_dict)
         if self.default:
             default = "default: "
         else:
