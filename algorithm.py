@@ -98,7 +98,7 @@ class Algorithm(object):
         provided_items = set([item for psu in state for item in psu_dict[psu]])
 
         # create a string from result_dict - every line one PSU with its items 
-        result_str = "".join([str(psu) + ":\t" + "".join([item+", " for item in result_dict[psu]])[:-2] + " \n" for psu in state if psu != 0])
+        result_str = "\n".join(["{}:\t{}".format(psu ,", ".join([item for item in result_dict[psu]])) for psu in state if psu != 0])
         
         # create string to summarize number of items of order that are satisfied
         provided_items_str = "Provided Items: {}/{}".format(len(provided_items), len(order))
