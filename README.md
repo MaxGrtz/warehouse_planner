@@ -109,5 +109,6 @@
             - but showed less decline in performance with an increase of items in the order
     - another idea could be to restrict the neighborhood in our implementation by subsampling 
       or just considering changes to the current state in one random position (instead of all positions)
+        -> here we have to consider a tradeoff between computation times and quality of results
 
 
