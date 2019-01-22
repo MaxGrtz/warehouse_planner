@@ -7,16 +7,16 @@
         -> minimizes the number of PSUs required to fulfill the order
 
 ## 2. Input: 
-    - two text-files and choice of algorithm
+    - two textfiles and choice of algorithm
     - problem.txt file that contains an inventory and a list of PSUs, each associated with a list of items they store 
     - order.txt file that contains items of that order
-    - buttons provide a means of chooing the desired algorithm for solving the given problem
+    - buttons provide a means of choosing the desired algorithm for solving the given problem
 
 ## 3. Output: 
     - local search result state
     - number of items of the order that are provided 
     - number of PSUs required to provide all items of the order
-    - list of specific PSUs and the items of the order they provide
+    - list of result state PSUs and the items of the order they provide
 
 ## 4. General information and requirements: 
     - Python 3.7x
@@ -82,7 +82,7 @@
     - the costs of a state are defined by two aspects:
         -> missing_items: number of items not provided by the current state (goal: provide all items of order)
         -> num_psus: number of PSUs used by the state to provide the order items (goal: minimize PSUs used)
-    - since it is more important to provide all items that to minimize the PSUs used, both factors are weighed differently
+    - since it is more important to provide all items than to minimize the PSUs used, both factors are weighed differently
     - cost = 10*(missing_items) + num_psus
 
 ## 7. Critical Assessment:
@@ -90,7 +90,7 @@
     - the chosen state representation is only useful for fairly small orders, but performs well in this domain
     - Problems: 
         -> for every additional item in the order the neighborhood of a state increases by the number of considered PSUs
-        -> this leads to an extreme decline in performance and worse results (because of the increasingly complex/big search space)
+        -> this leads to an extreme decline in performance and worse results (because of the increasingly complex/big neighborhoods)
     - alternative solution:
         -> represent a state by a binaray or boolean numpy array
         -> every position in such a state corresponds to a PSU 
@@ -100,13 +100,14 @@
         -> all calculations for example can be performed on a boolean matrix, where:
             - the rows represent order items (row 1 ~ order item 1)
             - the columns represent PSUs (column 1 ~ PSU 1)
-            - it captures the distribution of items in the PSUs
+            - it captures the distribution of order items in the PSUs
             - by filtering for PSUs in the current state one can easily check:
                 -> the number of PSUs used (number of columns)
                 -> the number of order items provided (np.any() on corresponding axis and sum over result vector)
         -> we tested an implementation of this for hill_climbing:
             - it performed worse for small orders
             - but showed less decline in performance with an increase of items in the order
-    
+    - another idea could be to restrict the neighborhood in our implementation by subsampling 
+      or just considering changes to the current state in one random position (instead of all positions)
 
 

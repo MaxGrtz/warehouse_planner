@@ -41,5 +41,5 @@ class Hill_Climbing(algorithm.Algorithm):
                 flag = False
             else:
                 state = result # update state with new state 
-        # return postpreocessed result
+        # return postprocessed result
         return self.post_processing(state, decode_dict, psu_dict, order)

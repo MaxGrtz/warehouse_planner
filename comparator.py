@@ -8,11 +8,17 @@ class Comparator(object):
     Class to compare all algorithms
     '''
     def __init__(self, psu_dict, order, decode_dict):
+        ''' 
+        initialize the comparator object with: psu_dict, order, and decode_dict
+        '''
         self.psu_dict = psu_dict
         self.order = order
         self.decode_dict = decode_dict
 
     def compare_all(self):
+        '''
+        creates instances of the different algorithms and creates a csv with an overview over the search results and durations
+        '''
         psu_dict = self.psu_dict
         order = self.order
         decode_dict = self.decode_dict
@@ -32,13 +38,15 @@ class Comparator(object):
         # create comparison result dict
         result_dict = {}
         for alg in algorithms:
+            
             start = time.time()
-            try:
-                provided_items_str, num_psus, result_str = alg.run()
-            except:
-                provided_items_str, num_psus, result_str, n_states = alg.run()
+            if not hasattr(alg, 'num_start_states'):
+                provided_items_str, num_psus, _ = alg.run()
+            else: 
+                provided_items_str, num_psus, _, n_states = alg.run()
                 alg.name = alg.name + " " + n_states
             end = time.time()
+
             items_provided = provided_items_str[16:].split('/') # get number of provided items and number of items in order from returned str
             # for every algorithm safe in dict: percentage of provided items, number of psus used, time needed for calculation
             result_dict[alg.name] = [int(items_provided[0])/int(items_provided[1])*100, num_psus[-2:], np.round(end-start, decimals=4)]

@@ -41,7 +41,7 @@ class First_Choice_Hill_Climbing(algorithm.Algorithm):
             if not updated:
                 flag = False
             
-        # return postpreocessed result
+        # return postprocessed result
         return self.post_processing(state, decode_dict, psu_dict, order)
             
         

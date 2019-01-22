@@ -8,7 +8,7 @@ class Algorithm(object):
 
     def __init__(self, psu_dict, order, decode_dict):
         '''
-        initialize psu_dict, order list and dict to decode items
+        initialize algorithm with psu_dict, order list and dict to decode items
         '''
         self.psu_dict = psu_dict
         self.order = order
@@ -28,7 +28,7 @@ class Algorithm(object):
     def get_neighbors(self, state, psu_dict):
         '''
         get neighbors of current state
-        parameters: state - current state (list of PSUs)
+        parameters: state - current state (list of PSU ids)
                     psu_dict - filtered dictionary of PSUs (key) and the numerically encoded items they hold (value)
         returns: neighbors - list of all neighboring states of the given current state
                 --> idea: neighboring states are states with only one PSU different from current state

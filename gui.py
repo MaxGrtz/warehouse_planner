@@ -97,9 +97,10 @@ class Gui(object):
     def load_order(self):
         '''
         method to initiate filedialog for reading order.txt file
-        creates order and missing item lists:
+        creates order and missing item lists and filters the psu_dict:
             - order: list of (valid) items in the order encoded numerically
             - missing_items: list of items from the order which are not in the inventory of the given problem.txt file
+            - filtered_psu_dict: dictionary containing only relevant PSUs and items
         '''
         try:
             # read the order file via filedoalog
@@ -122,7 +123,7 @@ class Gui(object):
             self.provided_items.set("")
             self.num_psus.set("")
             self.result_dict.set("")
-        except (AttributeError, TypeError) as e:
+        except (AttributeError, TypeError):
             # if self.encode_dict does not yet exist or is None, no problem file is selected
             self.status.set("Please select a problem file first!")
 
@@ -162,7 +163,7 @@ class Gui(object):
             
             end = time.time() # for timing
             # calculate duration of the algorithm execution
-            duration = "  [duration: " + str(np.round(end-start, decimals=4)) + " sec.]"
+            duration = "  [duration: {} sec.]".format(np.round(end-start, decimals=4))
 
             # update labels with local search result
             if name == 6:

@@ -9,6 +9,7 @@ class Local_Beam_Search(algorithm.Algorithm):
         '''
         super().__init__(psu_dict, order, decode_dict)
         self.name = "Local Beam Search"
+        # handle input of entry field for number of initial states: min 1, max 100
         self.default = False
         try: 
             self.num_start_states = int(num_start_states.replace(" ", ""))
@@ -24,28 +25,31 @@ class Local_Beam_Search(algorithm.Algorithm):
 
     def run(self):
         '''
-        method to run the algorithm from the constructed algrotihm object
+        method to run the algorithm from the constructed algorithm object
             returns: post precessed result - provided items, number of psus required, result state, number of initial states
         '''
         psu_dict = self.psu_dict
+        order = self.order
+        decode_dict = self.decode_dict
+        num_start_states = self.num_start_states
 
         # random initial states
-        states = [self.get_initial_state(psu_dict, self.order) for _ in range(self.num_start_states)]
+        states = [self.get_initial_state(psu_dict, order) for _ in range(num_start_states)]
 
         # costs of initial states
-        costs = [self.calculate_cost(state, psu_dict, self.order) for state in states]
+        costs = [self.calculate_cost(state, psu_dict, order) for state in states]
         cost_sum = sum(costs)
         min_cost = min(costs)
 
         flag = True
         while flag:
-            # get neighbors of current states, that have lower cost than the lowest cost current state
-            neighbors = [nb for state in states for nb in self.get_neighbors(state, psu_dict) if self.calculate_cost(nb, psu_dict, self.order) < min_cost]
+            # get neighbors of current states, that have lower cost than the lowest cost current state (only need better neighbors)
+            neighbors = [nb for state in states for nb in self.get_neighbors(state, psu_dict) if self.calculate_cost(nb, psu_dict, order) < min_cost]
 
             # get n lowest cost states from neighbors and current states
-            new_states = self.get_n_min_cost_states(states, neighbors, psu_dict, self.order, self.num_start_states) 
+            new_states = self.get_n_min_cost_states(states, neighbors, psu_dict, order, num_start_states) 
             # calculate new costs
-            new_costs = [self.calculate_cost(state, psu_dict, self.order) for state in new_states]
+            new_costs = [self.calculate_cost(state, psu_dict, order) for state in new_states]
 
             # if the cumulative cost of the new_states is lower than of the current states, then some improvement occured and we update
             # else end the search
@@ -61,12 +65,12 @@ class Local_Beam_Search(algorithm.Algorithm):
         min_cost_state = states[np.argmin(costs)]
 
         # return postprocessed results
-        provided_items_str, num_psus, result_str = self.post_processing(min_cost_state, self.decode_dict, psu_dict, self.order)
+        provided_items_str, num_psus, result_str = self.post_processing(min_cost_state, decode_dict, psu_dict, order)
         if self.default:
             default = "default: "
         else:
             default = ""
-        num_states = "(" + default + str(self.num_start_states) + " initial states)"
+        num_states = "({}{} initial states)".format(default, num_start_states)
         return provided_items_str, num_psus, result_str, num_states
 
 
@@ -81,15 +85,17 @@ class Local_Beam_Search(algorithm.Algorithm):
         returns: n lowest cost states from neighbors and current states
 
         '''
-        # concatenate current states with their neighbors
-        for state in states:
-            neighbors.append(state)
+        # concatenate current states with all neighbors
+        neighbors.extend(states)
         
-        # calculate costs for every state, save as tuples (state, cost) in list
-        costs = np.asarray([(c, self.calculate_cost(nb, psu_dict, order)) for c,nb in enumerate(neighbors)], dtype=[('state', int), ('cost', int)])
-        # sort by cost
-        sorted_costs = np.sort(costs, order='cost')
+        # calculate costs for every state, save in dict (state pos in neighbors: cost)
+        state_cost_dict = {c: self.calculate_cost(nb, psu_dict, order) for c,nb in enumerate(neighbors)}
+
+        # create list of tuples with sorted items of dict (by cost)
+        states_sorted_by_costs = [(k, state_cost_dict[k]) for k in sorted(state_cost_dict, key=state_cost_dict.get)]
+
         # get n lowest cost (state, cost) tuples
-        temp = sorted_costs[:num_start_states]
+        temp = states_sorted_by_costs[:num_start_states]
+        
         # return the n states with lowest cost
         return [neighbors[i[0]] for i in temp]
