@@ -88,6 +88,12 @@
 ## 7. Critical Assessment:
 ###     problem/state representation:
     - the chosen state representation is only useful for fairly small orders, but performs well in this domain
+    - the reasoning behind the choice of the state representation was as follows:
+        -> the most obvious choice was to use a binary array (length - num PSUs) that represents the state and the index the PSU ids
+        -> the value indicates wheher the PSU is part of the id or not
+        -> the idea was to condense this representation by only saving the indices of the one values in this array
+        -> we reasoned that we could restrict the length of the state to the number of items in the order,
+           since in the worst case we would need as many PSUs as there are items in the order 
     - Problems: 
         -> for every additional item in the order the neighborhood of a state increases by the number of considered PSUs
         -> this leads to an extreme decline in performance and worse results (because of the increasingly complex/big neighborhoods)
