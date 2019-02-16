@@ -11,6 +11,7 @@
     - problem.txt file that contains an inventory and a list of PSUs, each associated with a list of items they store 
     - order.txt file that contains items of that order
     - buttons provide a means of choosing the desired algorithm for solving the given problem
+    - text box to enter the number of start states for random restart hill climbing and local beam search
 
 ## 3. Output: 
     - local search result state
@@ -52,9 +53,9 @@
         -> are initialized with the information from the input files 
         -> contain a run method that implements the corresponding algorithm
         -> make use of the shared functions of the Algorithm class 
-        -> return the postprecessed solution states
+        -> return the postprocessed solution states
 ###     comparator.py
-    contains Comparator class:
+    contains comparator class:
         -> upon calling compare_all, instatiates all different algorithms and executes them
         -> tracks results and lets you download the a .csv file containing an overview
 
@@ -74,10 +75,10 @@
     - only keeping items that are in the order
 ###     state representation
     - observation: in the worst case we need as many PSUs as there are items in the order
-    - a state is therefore is represented by a list of PSU ids of the same length as the order
+    - a state is therefore represented by a list of PSU ids of the same length as the order
     - zeros in the state represent "no PSU" (allows for the state to consist of less PSUs, maintaining a constant state length)
 ###     neighborhood definition
-    - the neighborhood is defined by all states that differ from the current state in max. one position
+    - the neighborhood is defined by all states that differ from the current state in exactly one position
 ###     cost definition
     - the costs of a state are defined by two aspects:
         -> missing_items: number of items not provided by the current state (goal: provide all items of order)
